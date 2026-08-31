@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "technique profile",
+  "description": "the rules describing what a technique profile json file must contain. the technique profile holds a department's settings for one x-ray projection. this schema is the contract between the editing agent and the runtime engine: if a profile violates these rules, the engine refuses to load it. all distances are in centimeters, all angles in degrees.",
+  "type": "object",
+  "required": [
+    "projection",
+    "view",
+    "centering",
+    "rotation",
+    "exposure"
+  ],
+  "properties": {
+    "projection": {
+      "type": "string",
+      "description": "the shorthand name of the projection this profile applies to, for example chest-pa or pelvis-ap. unique across profiles."
+    },
+    "view": {
+      "type": "string",
+      "description": "the full radiography name of the view, for example chest posteroanterior or pelvis anteroposterior."
+    },
+    "centering": {
+      "type": "object",
+      "description": "where the central ray must pass through the patient.",
+      "required": ["landmark", "landmark_offset_cm", "collimation_bounds_cm"],
+      "properties": {
+        "landmark": {
+          "type": "string",
+          "description": "the anatomical landmark the central ray targets, for example t7 for chest pa or the iliac crest for pelvis ap."
+        },
+        "landmark_offset_cm": {
+          "type": "object",
+          "description": "the position on the detector plane where the central ray should land, as an offset from the detector center. not a source-to-image distance.",
+          "required": ["vertical_cm", "horizontal_cm"],
+          "properties": {
+            "vertical_cm": {
+              "type": "number",
+              "description": "offset in centimeters along the patient's long axis. negative means toward the feet, positive means toward the head."
+            },
+            "horizontal_cm": {
+              "type": "number",
+              "description": "offset in centimeters across the patient. negative means to one side, positive to the other, relative to the detector center."
+            }
+          }
+        },
+        "collimation_bounds_cm": {
+          "type": "object",
+          "description": "how far the light field may extend beyond the anatomy in each direction before the image is judged cut off.",
+          "required": ["superior_cm", "inferior_cm", "left_cm", "right_cm"],
+          "properties": {
+            "superior_cm": { "type": "number", "description": "allowable light-field extent above the anatomy in centimeters." },
+            "inferior_cm": { "type": "number", "description": "allowable light-field extent below the anatomy in centimeters." },
+            "left_cm": { "type": "number", "description": "allowable light-field extent on one side in centimeters." },
+            "right_cm": { "type": "number", "description": "allowable light-field extent on the other side in centimeters." }
+          }
+        }
+      }
+    },
+    "rotation": {
+      "type": "object",
+      "description": "how much the patient may rotate before the image is judged unacceptable.",
+      "required": ["max_yaw_degrees", "symmetry_check"],
+      "properties": {
+        "max_yaw_degrees": {
+          "type": "number",
+          "description": "the maximum rotation around the patient's long axis, in degrees, before the copilot flags it."
+        },
+        "symmetry_check": {
+          "type": "string",
+          "description": "which visible anatomical pairs the copilot measures for symmetry, for example sternoclavicular-joints for chest pa or iliac-wings for pelvis ap."
+        }
+      }
+    },
+    "inspiration": {
+      "type": ["object", "null"],
+      "description": "only for projections where breath-hold depth matters, like chest views. null when it does not apply.",
+      "required": ["target", "method"],
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "the desired breath state, for example full inspiration."
+        },
+        "method": {
+          "type": "string",
+          "description": "how the copilot measures it from the camera, for example chest wall expansion during the breath hold."
+        }
+      }
+    },
+    "exposure": {
+      "type": "object",
+      "description": "how thickness maps to exposure settings. the points are the department's own calibrated values, entered once. the engine interpolates linearly between them for any measured thickness.",
+      "required": ["points", "grid", "target_exposure_index"],
+      "properties": {
+        "points": {
+          "type": "array",
+          "description": "calibration points. each pair says: at this measured thickness in centimeters, use this kvp and this mas.",
+          "items": {
+            "type": "object",
+            "required": ["thickness_cm", "kvp", "mas"],
+            "properties": {
+              "thickness_cm": { "type": "number", "description": "measured patient thickness in centimeters." },
+              "kvp": { "type": "number", "description": "peak kilovoltage setting at this thickness." },
+              "mas": { "type": "number", "description": "milliampere-seconds setting at this thickness." }
+            }
+          },
+          "minItems": 2
+        },
+        "grid": {
+          "type": "boolean",
+          "description": "true when the room uses a grid (a device that blocks scattered x-rays) for this projection, which changes the needed exposure."
+        },
+        "target_exposure_index": {
+          "type": "object",
+          "description": "the acceptable range for the detector's exposure index. used only as a quality check after exposure, never as the recommendation target.",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "description": "lowest acceptable exposure index." },
+            "max": { "type": "number", "description": "highest acceptable exposure index." }
+          }
+        }
+      }
+    }
+  }
+}

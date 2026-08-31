@@ -1,0 +1,38 @@
+{
+  "projection": "chest-pa",
+  "view": "chest posteroanterior",
+  "centering": {
+    "landmark": "t7",
+    "landmark_offset_cm": {
+      "vertical_cm": 0.0,
+      "horizontal_cm": 0.0
+    },
+    "collimation_bounds_cm": {
+      "superior_cm": 2.0,
+      "inferior_cm": 2.0,
+      "left_cm": 2.0,
+      "right_cm": 2.0
+    }
+  },
+  "rotation": {
+    "max_yaw_degrees": 3.0,
+    "symmetry_check": "sternoclavicular-joints"
+  },
+  "inspiration": {
+    "target": "full inspiration",
+    "method": "chest wall expansion during breath hold"
+  },
+  "exposure": {
+    "points": [
+      { "thickness_cm": 18, "kvp": 95, "mas": 2.0 },
+      { "thickness_cm": 22, "kvp": 105, "mas": 2.8 },
+      { "thickness_cm": 26, "kvp": 115, "mas": 3.6 },
+      { "thickness_cm": 30, "kvp": 125, "mas": 5.0 }
+    ],
+    "grid": true,
+    "target_exposure_index": {
+      "min": 220,
+      "max": 280
+    }
+  }
+}
