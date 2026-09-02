@@ -68,6 +68,7 @@ rebase conflicts:
 
 ## academic and medical writing
 
+- this repo ships two paper-writing skills under .opencode/skills/: academic-paper (the drafting pipeline) and academic-paper-reviewer (simulated peer review). use them for any paper work in this repo. load academic-paper before drafting a section, and run academic-paper-reviewer before declaring any manuscript done.
 - the verification ledger (verification-ledger.md at repo root) is the source of truth for every claim this project relies on. consult it before citing anything, add a new entry for any claim that is not already there, and never present a pending entry as verified. this applies to every agent and every session, without being asked.
 - every factual claim carries a citation to a primary source. if you have not at least read the abstract, do not cite it.
 - never invent references, statistics, or findings. if a number cannot be verified, mark it unverified or drop it entirely.
